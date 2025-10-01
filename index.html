@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>ATOMIC LEADS - Customer Prospecting</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #0f172a;           /* Dark blue background */
+            --panel: #1e293b;        /* Panel background */
+            --muted: #94a3b8;        /* Muted text color */
+            --accent: #f59e0b;       /* Accent color - amber */
+            --neon: #8b5cf6;         /* Neon purple */
+            --low: #ef4444;          /* Red for Low status */
+            --hot: #f59e0b;          /* Amber for Hot status */
+            --deal: #10b981;         /* Green for Deal status */
+            --total: #6366f1;        /* Indigo for total count */
+            --goal: #ec4899;         /* Pink for goal */
+            --add: #3b82f6;          /* Blue for add button */
+        }
+        
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e2e8f0;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: var(--bg);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 80px;
+        }
+        
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* HEADER */
+        header.header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--panel);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo-container {
+            max-width: 180px;
+        }
+        
+        .logo-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+        
+        /* Profile */
+        .profile {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #0b2a3a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px solid var(--accent);
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-initial {
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--accent);
+        }
+        
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .profile-info .name {
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: white;
+        }
+        
+        .profile-info .role {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .profile .icon {
+            font-size: 18px;
+            color: var(--muted);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            margin-left: 10px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .profile .icon:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .profile .badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--hot);
+            color: #1e293b;
+            padding: 2px 6px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* Login box */
+        .login-card {
+            max-width: 420px;
+            margin: 50px auto;
+            padding: 25px;
+            border-radius: 12px;
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .login-card h2 {
+            margin: 0 0 20px 0;
+            font-size: 24px;
+            text-align: center;
+            color: var(--accent);
+        }
+        
+        .login-card input, .login-card select, .login-card button {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.07);
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+        
+        .login-card input:focus, .login-card select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .login-card input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .login-card button {
+            margin-top: 10px;
+            background: var(--accent);
+            color: #1e293b;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .login-card button:hover {
+            background: #fbbf24;
+            transform: translateY(-2px);
+        }
+
+        /* PERBAIKAN FONT UNTUK DROPDOWN */
+        .modal select option,
+        .login-card select option {
+            background: var(--panel);
+            color: #fff;
+            font-weight: 600;
+            padding: 10px;
+        }
+
+        .modal select,
+        .login-card select {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .modal select:invalid,
+        .login-card select:invalid {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .modal label {
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .modal input,
+        .modal textarea {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        #inputRole,
+        #inputStatus,
+        #inputSource {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        #inputRole option,
+        #inputStatus option,
+        #inputSource option {
+            background: #1e293b;
+            color: #fff;
+            padding: 10px;
+        }
+
+        .panel h5 {
+            font-weight: 800;
+            letter-spacing: 0.8px;
+        }
+
+        .pill {
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat {
+            padding: 15px;
+            border-radius: 12px;
+            background: var(--panel);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .stat .left {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .stat small {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .stat .value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #fff;
+        }
+        
+        .bubble {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #1e293b;
+            position: relative;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .bubble.total { background: var(--total); }
+        .bubble.low { background: var(--low); }
+        .bubble.hot { background: var(--hot); }
+        .bubble.deal { background: var(--deal); }
+        
+        .stat-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #fff;
+            color: #1e293b;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 12px;
+            min-width: 24px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-badge.total-badge { background: var(--total); color: white; }
+        .stat-badge.low-badge { background: var(--low); color: white; }
+        .stat-badge.hot-badge { background: var(--hot); color: #1e293b; }
+        .stat-badge.deal-badge { background: var(--deal); color: white; }
+
+        /* Goal card */
+        .goal {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            background: var(--panel);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .goal .left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .goal .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--goal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e293b;
+            font-weight: 800;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .goal .text {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            flex: 1;
+        }
+        
+        .goal .text small {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+        
+        .goal .text h4 {
+            margin: 3px 0 0 0;
+            font-size: 14px;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .goal .actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .goal .actions input {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.07);
+            color: inherit;
+            width: 300px;
+            font-size: 14px;
+        }
+
+        /* Leads panels */
+        .panels {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .panel {
+            background: var(--panel);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .panel .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .panel h5 {
+            margin: 0;
+            font-size: 14px;
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .panel .count {
+            font-weight: 800;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .panel .body {
+            margin-top: 12px;
+            max-height: 400px;
+            overflow: auto;
+        }
+        
+        .lead {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex;
+            flex-direction: column;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .lead:hover {
+            background: rgba(255, 255, 255, 0.07);
+            transform: translateY(-2px);
+        }
+        
+        .lead.low { border-left-color: var(--low); }
+        .lead.hot { border-left-color: var(--hot); }
+        .lead.deal { border-left-color: var(--deal); }
+        
+        .lead .title {
+            font-weight: 800;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .lead .details {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .lead .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .pill {
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 10px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+        
+        .pill.low { background: var(--low); }
+        .pill.hot { background: var(--hot); color: #1e293b; }
+        .pill.deal { background: var(--deal); }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            transition: all 0.2s ease;
+        }
+        
+        .call-btn {
+            background: var(--deal);
+            color: white;
+        }
+        
+        .call-btn:hover {
+            background: #0d9665;
+        }
+        
+        .wa-btn {
+            background: #25D366;
+            color: white;
+        }
+        
+        .wa-btn:hover {
+            background: #128C7E;
+        }
+        
+        .lead-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+        
+        .lead-actions button {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 5px;
+            border-radius: 5px;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+        }
+        
+        .lead-actions button:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        /* Footer control */
+        footer.control {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 20px;
+            background: var(--panel);
+            padding: 10px 20px;
+            border-radius: 999px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 200;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .control .add {
+            width: 55px;
+            height: 55px;
+            border-radius: 999px;
+            background: var(--add);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+        }
+        
+        .control .add:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+
+        /* Modal styles */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 400;
+            padding: 15px;
+        }
+        
+        .modal {
+            width: 100%;
+            max-width: 500px;
+            background: var(--panel);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .modal .header h4 {
+            color: #fff;
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .modal .body {
+            margin-top: 15px;
+        }
+        
+        .close-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 6px;
+            border-radius: 6px;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+        }
+        
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+        
+        /* Form elements in modal */
+        .modal label {
+            display: block;
+            margin-bottom: 6px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .modal input, .modal select, .modal textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.07);
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .modal input:focus, .modal select:focus, .modal textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .modal .form-row {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .modal .form-row > div {
+            flex: 1;
+        }
+        
+        .modal .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .modal .form-actions button {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        
+        .modal .form-actions .cancel-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--muted);
+        }
+        
+        .modal .form-actions .cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+        
+        .modal .form-actions .save-btn {
+            background: var(--neon);
+            color: white;
+        }
+        
+        .modal .form-actions .save-btn:hover {
+            background: #7c3aed;
+        }
+
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--low);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success {
+            background: var(--deal);
+        }
+        
+        .notification.warning {
+            background: var(--hot);
+            color: #1e293b;
+        }
+        
+        .notification.info {
+            background: var(--neon);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification-close {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Sync status indicator */
+        .sync-status {
+            position: fixed;
+            bottom: 90px;
+            left: 15px;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 1000;
+            background: var(--muted);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .sync-status.syncing {
+            background: var(--hot);
+            color: #1e293b;
+        }
+        
+        .sync-status.success {
+            background: var(--deal);
+        }
+        
+        .sync-status.error {
+            background: var(--low);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .panels {
+                grid-template-columns: 1fr;
+            }
+            
+            .wrap {
+                padding: 12px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            footer.control {
+                padding: 8px 15px;
+            }
+            
+            .stat {
+                padding: 12px;
+            }
+            
+            .bubble {
+                width: 45px;
+                height: 45px;
+                font-size: 16px;
+            }
+            
+            .stat-badge {
+                top: -7px;
+                right: -7px;
+                padding: 3px 6px;
+                font-size: 11px;
+                min-width: 20px;
+            }
+            
+            .goal .actions input {
+                width: 200px;
+            }
+            
+            .control .add {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            header.header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .profile {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .sync-status {
+                bottom: 85px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: max-content;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat {
+                flex-direction: row;
+                text-align: left;
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .goal {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .goal .left {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .goal .actions input {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .logo-container {
+                max-width: 150px;
+            }
+            
+            .modal .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .profile-info .name {
+                font-size: 13px;
+            }
+            
+            .profile-info .role {
+                font-size: 11px;
+            }
+            
+            .avatar {
+                width: 35px;
+                height: 35px;
+            }
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Loading indicator */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Connection status indicator */
+        .connection-status {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 1000;
+            background: var(--low);
+            color: white;
+            display: none;
+        }
+        
+        .connection-status.online {
+            background: var(--deal);
+            display: block;
+        }
+        
+        .connection-status.offline {
+            background: var(--low);
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="connection-status" id="connectionStatus"></div>
+<div class="sync-status" id="syncStatus" style="display: none;">
+    <i class="fas fa-sync"></i> <span id="syncStatusText">Menyinkronkan...</span>
+</div>
+
+<div class="wrap">
+    <header class="header" id="headerPanel" style="display:none">
+        <div class="logo-container">
+            <!-- Ganti dengan URL logo Anda -->
+            <img src="logo-atomic.png" alt="ATOMIC LEADS" />
+        </div>
+
+        <div class="profile" id="profilePanel">
+            <div class="avatar" id="avatarWrap">
+                <div id="avatarInitial" class="avatar-initial">OP</div>
+            </div>
+            <div class="profile-info">
+                <div class="name" id="profileName">NAMA LENGKAP</div>
+                <div class="role" id="profileRole">ROLE</div>
+            </div>
+            <div class="icon" id="recapBtn" title="Download Excel Report">
+                <i class="fa-solid fa-file-excel"></i>
+            </div>
+            <div class="icon" id="syncBtn" title="Sinkronkan ke Google Sheets" style="display: none;">
+    <i class="fas fa-sync"></i>
+</div>
+            <div class="icon" id="bellBtn" title="Hot leads">
+                <i class="fa-solid fa-fire"></i>
+                <div class="badge" id="notifBadge">0</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="login-card" id="loginCard">	
+        <h2>WELCOME TO ATOMIC</h2>
+        <img src="logo-atomic.png" alt="ATOMIC LEADS" style="max-width: 180px; margin: 0 auto 20px; display: block; border-radius: 8px;" />
+        <input id="inputName" type="text" placeholder="Nama Agent (contoh: Sakti Ananda)" />
+        <select id="inputRole">
+            <option value="">Pilih Role</option>
+            <option>MARKETING</option>
+            <option>TEAM LEADER</option>
+            <option>CRM</option>
+        </select>
+        <button id="btnLogin">MASUK</button>
+    </div>
+
+    <div id="dashboard" style="display:none">
+        <div class="stats-grid">
+            <div class="stat">
+                <div class="left">
+                    <small>Total Leads</small>
+                    <div class="value" id="valueTotal">0</div>
+                </div>
+                <div class="bubble total">
+                    <i class="fa-solid fa-users"></i>
+                    <div class="stat-badge total-badge" id="badgeTotal">0</div>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="left">
+                    <small>Low Potential</small>
+                    <div class="value" id="valueLow">0</div>
+                </div>
+                <div class="bubble low">
+                    <i class="fa-solid fa-arrow-down"></i>
+                    <div class="stat-badge low-badge" id="badgeLow">0</div>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="left">
+                    <small>Hot Potential</small>
+                    <div class="value" id="valueHot">0</div>
+                </div>
+                <div class="bubble hot">
+                    <i class="fas fa-fire"></i>
+                    <div class="stat-badge hot-badge" id="badgeHot">0</div>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="left">
+                    <small>Deal Closed</small>
+                    <div class="value" id="valueDeal">0</div>
+                </div>
+                <div class="bubble deal">
+                    <i class="fas fa-handshake"></i>
+                    <div class="stat-badge deal-badge" id="badgeDeal">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="goal">
+            <div class="left">
+                <div class="icon"><i class="fas fa-bullseye"></i></div>
+                <div class="text">
+                    <small>TARGET / PENCAPAIAN</small>
+                    <h4 id="goalText">CAPAI TARGET 150% PENJUALAN</h4>
+                </div>
+            </div>
+            <div class="actions">
+                <input id="goalInput" style="display:none" placeholder="Masukkan target baru" />
+                <button id="btnEditGoal" class="close-btn"><i class="fas fa-edit"></i></button>
+                <button id="btnSaveGoal" class="close-btn" style="display:none"><i class="fas fa-save"></i></button>
+            </div>
+        </div>
+
+        <div class="panels">
+            <div class="panel" id="panelLow">
+                <div class="header" onclick="togglePanel('Low')">
+                    <h5 style="color: var(--low)">Low Potential</h5>
+                    <div class="count" id="countLow">0</div>
+                </div>
+                <div class="body" id="bodyLow"></div>
+            </div>
+
+            <div class="panel" id="panelHot">
+                <div class="header" onclick="togglePanel('Hot')">
+                    <h5 style="color: var(--hot)">Hot Potential</h5>
+                    <div class="count" id="countHot">0</div>
+                </div>
+                <div class="body" id="bodyHot"></div>
+            </div>
+
+            <div class="panel" id="panelDeal">
+                <div class="header" onclick="togglePanel('Deal')">
+                    <h5 style="color: var(--deal)">Deal Closed</h5>
+                    <div class="count" id="countDeal">0</div>
+                </div>
+                <div class="body" id="bodyDeal"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="control" id="footerControl" style="display:none">
+    <button class="add" id="openAdd" title="Tambah Lead Baru"><i class="fa-solid fa-plus"></i></button>
+</footer>
+
+<div id="addModal" class="modal-backdrop" style="display:none">
+    <div class="modal">
+        <div class="header">
+            <h4 id="modalTitle">Tambah Lead Baru</h4>
+            <button class="close-btn" onclick="closeAddModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="body">
+            <label>Nama</label>
+            <input id="inputNameField" placeholder="Nama customer" />
+            
+            <div class="form-row">
+                <div>
+                    <label>Nomor Telepon</label>
+                    <input id="inputPhone" type="tel" placeholder="08xxxxxxxxxx" />
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input id="inputEmail" type="email" placeholder="customer@email.com" />
+                </div>
+            </div>
+
+            <label>Alamat</label>
+            <textarea id="inputAddress" rows="2" placeholder="Alamat customer"></textarea>
+
+            <div class="form-row">
+                <div>
+                    <label>Unit yang Diminati</label>
+                    <input id="inputUnit" placeholder="Contoh: CRF" />
+                </div>
+                <div>
+                    <label>Tipe Penjualan</label>
+                    <select id="inputSalesType">
+                        <option value="Cash">Cash</option>
+                        <option value="Credit">Credit</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label>Status</label>
+                    <select id="inputStatus">
+                        <option value="Low">Low Potential</option>
+                        <option value="Hot">Hot Potential</option>
+                        <option value="Deal">Deal Closed</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Sumber</label>
+                    <select id="inputSource">
+                        <option value="Walk-in">Walk-in</option>
+                        <option value="Referral">Referral</option>
+                        <option value="Website">Website</option>
+                        <option value="Social Media">Social Media</option>
+                        <option value="Event">Event</option>
+                        <option value="Other">Lainnya</option>
+                    </select>
+                </div>
+            </div>
+
+            <label>Catatan</label>
+            <textarea id="inputNotes" rows="3" placeholder="Catatan tambahan tentang lead ini"></textarea>
+
+            <div class="form-actions">
+                <button class="cancel-btn" onclick="closeAddModal()">Batal</button>
+                <button class="save-btn" id="saveLeadBtn" onclick="saveLead()">Simpan Lead</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="recapModal" class="modal-backdrop" style="display:none">
+    <div class="modal">
+        <div class="header">
+            <h4>Dashboard Leads Bulanan</h4>
+            <button class="close-btn" onclick="closeRecapModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="body">
+            <div class="chart-container">
+                <canvas id="recapChart"></canvas>
+            </div>
+            <div style="margin-top:12px;color:var(--muted);font-size:12px;text-align:center" id="recapChartMessage">
+                Tren konversi lead berdasarkan tanggal input.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="leadModal" class="modal-backdrop" style="display:none">
+    <div class="modal">
+        <div class="header">
+            <h4 id="leadModalTitle">Detail Lead</h4>
+            <button class="close-btn" onclick="closeLeadModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="body">
+            <div id="leadModalContent"></div>
+            <div class="form-actions">
+                <button class="cancel-btn" onclick="closeLeadModal()">Tutup</button>
+                <button id="leadModalEditBtn" class="save-btn">Edit Lead</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================
+// KONFIGURASI APLIKASI
+// ============================
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxB_m1nHEPFMhtizuE_HhsXNoFXFxWB4igrx0ACxNPOjeGrUiT9RrNg2lOqRJZXW_Qjrg/exec';
+
+// Data awal
+let leads = [];
+let editingId = null;
+
+// ============================
+// FUNGSI PENGAMBILAN DATA DARI SERVER
+// ============================
+async function fetchLeadsFromServer() {
+    const userData = JSON.parse(localStorage.getItem('atomic_user') || 'null');
+    if (!userData || !userData.name) return;
+
+    showNotification('Mengambil data dari server...', 'info');
+
+    try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'getLeads',
+                employee: userData.name
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            leads = result.data || [];
+            renderAll();
+            showNotification('Data berhasil dimuat dari server!', 'success');
+        } else {
+            throw new Error(result.message || 'Gagal mengambil data dari server.');
+        }
+    } catch (error) {
+        console.error('Error fetching leads from server:', error);
+        showNotification(`Gagal memuat data: ${error.message}. Memuat dari data lokal.`, 'error');
+        // Jika gagal, coba muat dari local storage sebagai fallback
+        const storedLeads = localStorage.getItem('atomic_leads');
+        if (storedLeads) {
+            leads = JSON.parse(storedLeads);
+            renderAll();
+        }
+    }
+}
+
+
+// ============================
+// FUNGSI SINKRONISASI DATA KE GOOGLE SHEETS
+// ============================
+async function syncLeadsToServer() {
+    const userData = JSON.parse(localStorage.getItem('atomic_user') || '{}');
+    if (!userData.name) return;
+
+    showNotification('Menyinkronkan data ke server...', 'info');
+    
+    try {
+        const syncData = {
+            action: 'syncLeads',
+            employee: userData.name,
+            role: userData.role,
+            leads: leads
+        };
+        
+        await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Cukup kirim, tidak perlu tunggu response detail
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(syncData)
+        });
+        
+        console.log('Sync request sent to Google Sheets.');
+        showNotification('Sinkronisasi selesai!', 'success');
+        
+    } catch (error) {
+        console.error('Error syncing data to server:', error);
+        showNotification('Gagal menyinkronisasi data.', 'error');
+    }
+}
+
+async function postDataToGoogleSheets(data) {
+    try {
+        await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Cukup kirim, tidak perlu tunggu response detail
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        return true;
+    } catch (error) {
+        console.error('Error posting data to Google Sheets:', error);
+        return false;
+    }
+}
+
+// ============================
+// FUNGSI MANAJEMEN LEAD
+// ============================
+async function saveLead() {
+    const name = document.getElementById('inputNameField').value.trim();
+    if (!name) {
+        showNotification('Nama lead harus diisi', 'error');
+        return;
+    }
+    
+    const phone = document.getElementById('inputPhone').value.trim();
+    const email = document.getElementById('inputEmail').value.trim();
+    const address = document.getElementById('inputAddress').value.trim();
+    const unit = document.getElementById('inputUnit').value.trim();
+    const salesType = document.getElementById('inputSalesType').value;
+    const status = document.getElementById('inputStatus').value;
+    const source = document.getElementById('inputSource').value;
+    const notes = document.getElementById('inputNotes').value.trim();
+    
+    const saveBtn = document.getElementById('saveLeadBtn');
+    const originalText = saveBtn.textContent;
+    saveBtn.innerHTML = '<span class="loading"></span> Menyimpan...';
+    saveBtn.disabled = true;
+    
+    try {
+        const today = new Date().toISOString();
+        const userData = JSON.parse(localStorage.getItem('atomic_user') || '{}');
+
+        let leadData;
+        let action;
+
+        if (editingId) {
+            const index = leads.findIndex(l => l.id === editingId);
+            if (index !== -1) {
+                leads[index] = { ...leads[index], name, phone, email, address, unit, salesType, status, source, notes, lastUpdated: today };
+                leadData = leads[index];
+                action = 'updateLead';
+            }
+        } else {
+            const newLead = {
+                id: Date.now(),
+                name, phone, email, address, unit, salesType, status, source, notes,
+                date: today, lastUpdated: today
+            };
+            leads.push(newLead);
+            leadData = newLead;
+            action = 'addLead';
+        }
+
+        if (leadData) {
+            const payload = {
+                action: action,
+                employee: userData.name,
+                role: userData.role,
+                ...leadData
+            };
+            // Mengirim data ke Google Sheets di background
+            postDataToGoogleSheets(payload).then(success => {
+                if (!success) {
+                    showNotification('Gagal menyimpan ke G-Sheets. Data disimpan lokal.', 'warning');
+                }
+            });
+        }
+        
+        closeAddModal();
+        renderAll();
+        showNotification(editingId ? 'Lead berhasil diperbarui!' : 'Lead berhasil ditambahkan!', 'success');
+        
+    } catch (error) {
+        console.error('Error saving lead:', error);
+        showNotification('Error menyimpan lead. Silakan coba lagi.', 'error');
+    } finally {
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
+        editingId = null;
+    }
+}
+
+async function deleteLead(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus lead ini?')) return;
+    
+    const index = leads.findIndex(l => l.id === id);
+    if (index === -1) return;
+    
+    const userData = JSON.parse(localStorage.getItem('atomic_user') || '{}');
+    
+    // Hapus dari array lokal
+    leads.splice(index, 1);
+    renderAll();
+    
+    // Hapus dari Google Sheets di background
+    const payload = {
+        action: 'deleteLead',
+        leadId: id,
+        employee: userData.name
+    };
+
+    postDataToGoogleSheets(payload).then(success => {
+        if(success) {
+            showNotification('Lead berhasil dihapus!', 'success');
+        } else {
+            showNotification('Gagal menghapus dari G-Sheets. Data dihapus lokal.', 'warning');
+        }
+    });
+}
+
+
+// ============================
+// FUNGSI RENDER & MANAJEMEN UI
+// ============================
+function renderAll() {
+    renderLeadLists();
+    updateStats();
+    updateNotificationBadge();
+    // Simpan ke local storage sebagai backup
+    localStorage.setItem('atomic_leads', JSON.stringify(leads));
+}
+
+function renderLeadLists() {
+    const bodies = {
+        'Low': document.getElementById('bodyLow'),
+        'Hot': document.getElementById('bodyHot'),
+        'Deal': document.getElementById('bodyDeal')
+    };
+    
+    Object.values(bodies).forEach(body => body.innerHTML = '');
+    
+    const lowLeads = leads.filter(l => l.status === 'Low').sort((a, b) => new Date(b.date) - new Date(a.date));
+    const hotLeads = leads.filter(l => l.status === 'Hot').sort((a, b) => new Date(b.date) - new Date(a.date));
+    const dealLeads = leads.filter(l => l.status === 'Deal').sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    lowLeads.forEach(lead => bodies['Low'].appendChild(createLeadElement(lead)));
+    hotLeads.forEach(lead => bodies['Hot'].appendChild(createLeadElement(lead)));
+    dealLeads.forEach(lead => bodies['Deal'].appendChild(createLeadElement(lead)));
+    
+    const noLeadsMsg = '<div style="color:var(--muted);padding:15px;text-align:center;font-size:13px">Tidak ada leads</div>';
+    if (lowLeads.length === 0) bodies['Low'].innerHTML = noLeadsMsg;
+    if (hotLeads.length === 0) bodies['Hot'].innerHTML = noLeadsMsg;
+    if (dealLeads.length === 0) bodies['Deal'].innerHTML = noLeadsMsg;
+    
+    document.getElementById('countLow').textContent = lowLeads.length;
+    document.getElementById('countHot').textContent = hotLeads.length;
+    document.getElementById('countDeal').textContent = dealLeads.length;
+}
+
+function createLeadElement(lead) {
+    const el = document.createElement('div');
+    el.className = `lead ${lead.status.toLowerCase()}`;
+    el.innerHTML = `
+        <div class="title" onclick="showLeadDetails(${lead.id})">${escapeHtml(lead.name)}</div>
+        <div class="details">${escapeHtml(lead.unit || 'Tidak ada unit')} - ${escapeHtml(lead.salesType || 'Tidak ada tipe')}</div>
+        <div class="details">${formatPhone(lead.phone)}</div>
+        <div class="meta">
+            <div>
+                <div class="pill ${lead.status.toLowerCase()}">${lead.status.toUpperCase()}</div>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn call-btn" onclick="callNumber('${lead.phone}')"><i class="fas fa-phone"></i> Call</button>
+                <button class="action-btn wa-btn" onclick="whatsappNumber('${lead.phone}')"><i class="fab fa-whatsapp"></i> WA</button>
+            </div>
+        </div>
+        <div class="lead-actions">
+            <button onclick="startEditLead(${lead.id})"><i class="fas fa-edit"></i> Edit</button>
+            <button onclick="deleteLead(${lead.id})"><i class="fas fa-trash"></i> Hapus</button>
+        </div>
+    `;
+    return el;
+}
+
+function updateStats() {
+    const total = leads.length;
+    const low = leads.filter(l => l.status === 'Low').length;
+    const hot = leads.filter(l => l.status === 'Hot').length;
+    const deal = leads.filter(l => l.status === 'Deal').length;
+    
+    document.getElementById('badgeTotal').textContent = total;
+    document.getElementById('badgeLow').textContent = low;
+    document.getElementById('badgeHot').textContent = hot;
+    document.getElementById('badgeDeal').textContent = deal;
+    
+    document.getElementById('valueTotal').textContent = total;
+    document.getElementById('valueLow').textContent = low;
+    document.getElementById('valueHot').textContent = hot;
+    document.getElementById('valueDeal').textContent = deal;
+}
+
+function updateNotificationBadge() {
+    const hotLeadsCount = leads.filter(l => l.status === 'Hot').length;
+    const badge = document.getElementById('notifBadge');
+    badge.textContent = hotLeadsCount;
+    badge.style.display = hotLeadsCount > 0 ? 'block' : 'none';
+}
+
+function startEditLead(id) {
+    const lead = leads.find(l => l.id === id);
+    if (!lead) return;
+    
+    editingId = id;
+    document.getElementById('modalTitle').textContent = 'Edit Lead';
+    document.getElementById('inputNameField').value = lead.name;
+    document.getElementById('inputPhone').value = lead.phone;
+    document.getElementById('inputEmail').value = lead.email;
+    document.getElementById('inputAddress').value = lead.address;
+    document.getElementById('inputUnit').value = lead.unit;
+    document.getElementById('inputSalesType').value = lead.salesType;
+    document.getElementById('inputStatus').value = lead.status;
+    document.getElementById('inputSource').value = lead.source;
+    document.getElementById('inputNotes').value = lead.notes;
+    
+    document.getElementById('addModal').style.display = 'flex';
+}
+
+function showLeadDetails(id) {
+    const lead = leads.find(l => l.id === id);
+    if (!lead) return;
+    
+    document.getElementById('leadModalTitle').textContent = 'Detail Lead';
+    
+    const content = document.getElementById('leadModalContent');
+    content.innerHTML = `
+        <div style="display:grid;gap:12px;">
+            <div><label style="font-size:13px;color:var(--muted);margin-bottom:4px;display:block;">Nama:</label><div style="font-weight:500;">${escapeHtml(lead.name)}</div></div>
+            <div><label style="font-size:13px;color:var(--muted);margin-bottom:4px;display:block;">Telepon:</label><div>${formatPhone(lead.phone)}</div></div>
+            <div><label style="font-size:13px;color:var(--muted);margin-bottom:4px;display:block;">Email:</label><div>${escapeHtml(lead.email || 'Tidak ada email')}</div></div>
+            <div><label style="font-size:13px;color:var(--muted);margin-bottom:4px;display:block;">Alamat:</label><div>${escapeHtml(lead.address || 'Tidak ada alamat')}</div></div>
+            <div><label style="font-size:13px;color:var(--muted);margin-bottom:4px;display:block;">Unit:</label><div>${escapeHtml(lead.unit || 'Tidak ada unit')}</div></div>
+            <div><label style="font-size:13px;color:var(--muted);margin-bottom:4px;display:block;">Tipe Penjualan:</label><div>${lead.salesType || 'Tidak ditentukan'}</div></div>
+            <div><label style="font-size:13px;color:var(--muted);margin-bottom:4px;display:block;">Status:</label><div class="pill ${lead.status.toLowerCase()}">${lead.status.toUpperCase()}</div></div>
+            <div><label style="font-size:13px;color:var(--muted);margin-bottom:4px;display:block;">Sumber:</label><div>${lead.source || 'Tidak ditentukan'}</div></div>
+            <div><label style="font-size:13px;color:var(--muted);margin-bottom:4px;display:block;">Catatan:</label><div>${escapeHtml(lead.notes || 'Tidak ada catatan')}</div></div>
+            <div><label style="font-size:13px;color:var(--muted);margin-bottom:4px;display:block;">Dibuat:</label><div>${formatDate(lead.date)}</div></div>
+            <div><label style="font-size:13px;color:var(--muted);margin-bottom:4px;display:block;">Terakhir Diupdate:</label><div>${formatDate(lead.lastUpdated)}</div></div>
+        </div>
+    `;
+    
+    document.getElementById('leadModalEditBtn').onclick = () => {
+        closeLeadModal();
+        startEditLead(id);
+    };
+    
+    document.getElementById('leadModal').style.display = 'flex';
+}
+
+// ============================
+// FUNGSI UTILITAS
+// ============================
+function escapeHtml(text) {
+    if (typeof text !== 'string') return '';
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'Tidak diketahui';
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? dateString : date.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function formatPhone(phone) {
+    if (!phone) return 'Tidak ada telepon';
+    const cleaned = ('' + phone).replace(/\D/g, '');
+    const match = cleaned.match(/^(62|0)(\d{3,4})(\d{4})(\d{3,4})$/);
+    if (match) {
+        return `+62 ${match[2]}-${match[3]}-${match[4]}`;
+    }
+    return phone;
+}
+
+function togglePanel(status) {
+    const body = document.getElementById(`body${status}`);
+    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+function openAddModal() {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'Tambah Lead Baru';
+    // Membersihkan field secara manual
+    document.getElementById('inputNameField').value = '';
+    document.getElementById('inputPhone').value = '';
+    document.getElementById('inputEmail').value = '';
+    document.getElementById('inputAddress').value = '';
+    document.getElementById('inputUnit').value = '';
+    document.getElementById('inputSalesType').value = 'Cash';
+    document.getElementById('inputStatus').value = 'Low';
+    document.getElementById('inputSource').value = 'Walk-in';
+    document.getElementById('inputNotes').value = '';
+    document.getElementById('addModal').style.display = 'flex';
+}
+
+function closeAddModal() {
+    document.getElementById('addModal').style.display = 'none';
+    editingId = null;
+}
+
+function closeLeadModal() { document.getElementById('leadModal').style.display = 'none'; }
+function closeRecapModal() { document.getElementById('recapModal').style.display = 'none'; }
+
+function doLogin(name, role) {
+    const userData = { name: name.toUpperCase(), role };
+    localStorage.setItem('atomic_user', JSON.stringify(userData));
+    
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('footerControl').style.display = 'flex';
+    document.getElementById('headerPanel').style.display = 'flex';
+    
+    document.getElementById('profileName').textContent = userData.name;
+    document.getElementById('profileRole').textContent = userData.role;
+    
+    const initials = userData.name.split(' ').map(n => n[0]).join('').slice(0, 2);
+    document.getElementById('avatarInitial').textContent = initials;
+    
+    loadGoal();
+    showNotification(`Selamat datang, ${userData.name}!`, 'success');
+    
+    // Ambil data dari server setelah login
+    fetchLeadsFromServer();
+}
+
+function loadGoal() {
+    const savedGoal = localStorage.getItem('atomic_monthly_goal') || 'CAPAI TARGET 150% PENJUALAN';
+    document.getElementById('goalText').textContent = savedGoal;
+}
+
+function saveGoal(newGoal) {
+    localStorage.setItem('atomic_monthly_goal', newGoal);
+    document.getElementById('goalText').textContent = newGoal;
+    showNotification('Target bulanan diperbarui!', 'success');
+}
+
+// ============================
+// FUNGSI TELEPON & WHATSAPP
+// ============================
+function callNumber(phone) {
+    if (!phone) { showNotification('Nomor telepon tidak tersedia', 'error'); return; }
+    window.open(`tel:${phone.replace(/\D/g, '')}`, '_self');
+}
+
+function whatsappNumber(phone) {
+    if (!phone) { showNotification('Nomor telepon tidak tersedia', 'error'); return; }
+    let formattedPhone = phone.replace(/\D/g, '');
+    if (formattedPhone.startsWith('0')) {
+        formattedPhone = '62' + formattedPhone.substring(1);
+    }
+    window.open(`https://wa.me/${formattedPhone}`, '_blank');
+}
+
+// ============================
+// FUNGSI NOTIFIKASI
+// ============================
+function showNotification(message, type = 'info') {
+    const iconMap = { success: 'fa-check-circle', warning: 'fa-exclamation-triangle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `<i class="fas ${iconMap[type]}"></i><span>${message}</span><button class="notification-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 5000);
+}
+
+// ============================
+// FUNGSI EXPORT EXCEL
+// ============================
+function exportToExcel() {
+    const userData = JSON.parse(localStorage.getItem('atomic_user') || '{}');
+    const filename = `Leads_Report_${userData.name || 'All'}_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+    const dataToExport = leads.map(lead => ({
+        'Nama Customer': lead.name,
+        'Status': lead.status,
+        'Unit Diminati': lead.unit,
+        'Tipe Penjualan': lead.salesType,
+        'Sumber': lead.source,
+        'Nomor Telepon': lead.phone,
+        'Email': lead.email,
+        'Alamat': lead.address,
+        'Tanggal Input': formatDate(lead.date),
+        'Update Terakhir': formatDate(lead.lastUpdated),
+        'Catatan': lead.notes,
+    }));
+
+    if (dataToExport.length === 0) {
+        showNotification("Tidak ada data untuk di-export.", "warning");
+        return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Leads Report");
+    XLSX.writeFile(workbook, filename);
+    showNotification("Laporan Excel berhasil dibuat!", "success");
+}
+
+// ============================
+// INISIALISASI APLIKASI
+// ============================
+document.addEventListener('DOMContentLoaded', function() {
+    const userData = JSON.parse(localStorage.getItem('atomic_user') || 'null');
+    if (userData && userData.name) {
+        doLogin(userData.name, userData.role);
+    } else {
+        document.getElementById('loginCard').style.display = 'block';
+    }
+    
+    document.getElementById('btnLogin').addEventListener('click', function() {
+        const name = document.getElementById('inputName').value.trim();
+        const role = document.getElementById('inputRole').value;
+        if (!name || !role) {
+            showNotification('Harap masukkan nama dan pilih role', 'error');
+            return;
+        }
+        doLogin(name, role);
+    });
+    
+    document.getElementById('openAdd').addEventListener('click', openAddModal);
+    
+    document.getElementById('btnEditGoal').addEventListener('click', function() {
+        document.getElementById('goalInput').style.display = 'block';
+        document.getElementById('goalInput').value = document.getElementById('goalText').textContent;
+        document.getElementById('goalText').style.display = 'none';
+        this.style.display = 'none';
+        document.getElementById('btnSaveGoal').style.display = 'block';
+        document.getElementById('goalInput').focus();
+    });
+    
+    document.getElementById('btnSaveGoal').addEventListener('click', function() {
+        const newGoal = document.getElementById('goalInput').value.trim();
+        if (newGoal) saveGoal(newGoal);
+        document.getElementById('goalInput').style.display = 'none';
+        document.getElementById('goalText').style.display = 'block';
+        this.style.display = 'none';
+        document.getElementById('btnEditGoal').style.display = 'block';
+    });
+    
+    document.getElementById('recapBtn').addEventListener('click', exportToExcel);
+    document.getElementById('syncBtn').addEventListener('click', syncLeadsToServer);
+    
+    document.getElementById('bellBtn').addEventListener('click', function() {
+        const hotLeads = leads.filter(l => l.status === 'Hot');
+        if (hotLeads.length > 0) {
+            // Urutkan berdasarkan tanggal terbaru
+            hotLeads.sort((a, b) => new Date(b.date) - new Date(a.date));
+            showLeadDetails(hotLeads[0].id);
+        } else {
+            showNotification('Tidak ada hot leads saat ini', 'info');
+        }
+    });
+
+    // Validasi input nomor telepon
+    document.getElementById('inputPhone').addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9+\-]/g, '');
+    });
+});
+</script>
+</body>
+</html>
